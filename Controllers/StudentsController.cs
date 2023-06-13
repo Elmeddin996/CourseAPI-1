@@ -1,6 +1,8 @@
 ﻿using CourseApi.DAL;
+using CourseApi.Dtos.StudentDtos;
 using CourseApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CourseApi.Controllers
 {
@@ -15,35 +17,70 @@ namespace CourseApi.Controllers
             _context = context;
         }
 
-        [HttpPost("")]
-        public ActionResult Create(Student student,int groupId)
+        [HttpGet("{id}")]
+        public ActionResult<StudentGetDto> Get(int id)
         {
-            if (!_context.Groups.Any(x => x.Id == groupId))
+            var data = _context.Students.Include(x => x.Group).FirstOrDefault(x => x.Id == id);
+
+            if (data == null)
+                return NotFound();
+
+            var studentDto = new StudentGetDto
             {
-                ModelState.AddModelError("groupId", "GroupId is not correct");
+                Id = id,
+                FullName = data.FullName,
+                Email = data.Email,
+                AvgPoint = data.AvgPoint,
+                Group = new GroupInStudentGetDto
+                {
+                    Id = data.GroupId,
+                    No = data.Group.No
+                }
+            };
+
+            return Ok(studentDto);
+        }
+
+        [HttpPost("")]
+        public ActionResult Create(StudentPostDto studentDto)
+        {
+            if (!_context.Groups.Any(x => x.Id == studentDto.GroupId))
+            {
+                ModelState.AddModelError("GroupId", "Group not found");
                 return BadRequest(ModelState);
             }
 
-            student.GroupId = groupId;
+            if (_context.Students.Any(x => x.Email == studentDto.Email))
+            {
+                ModelState.AddModelError("Email", "Email is already taken");
+                return BadRequest(ModelState);
+            }
 
-            _context.Students.Add(student);
+            Student std = new Student
+            {
+                FullName = studentDto.FullName,
+                Email = studentDto.Email,
+                AvgPoint = studentDto.AvgPoint,
+                GroupId = studentDto.GroupId,
+            };
+
+            _context.Students.Add(std);
             _context.SaveChanges();
-
-            return StatusCode(201, new { Id = student.Id, GroupId = student.GroupId });
+            return StatusCode(201, new { Id = std.Id });
         }
 
         [HttpGet("")]
-        public ActionResult<List<Student>> GetAll()
+        public ActionResult<List<StudentGetAllDto>> GetAll()
         {
             var data = _context.Students.ToList();
 
             return Ok(data);
         }
 
-        [HttpPut("")]
-        public ActionResult Edit(Student student)
+        [HttpPut("{id}")]
+        public ActionResult Edit(int id, StudentPutDto student)
         {
-            Student existStudent = _context.Students.Find(student.Id);
+            Student existStudent = _context.Students.Find(id);
 
             if (existStudent == null) return NotFound();
 
@@ -53,7 +90,7 @@ namespace CourseApi.Controllers
             _context.Students.Add(existStudent);
             _context.SaveChanges();
 
-            return StatusCode(201, new { Id = student.Id });
+            return StatusCode(201, new { Id = id});
         }
 
         [HttpDelete("{id}")]

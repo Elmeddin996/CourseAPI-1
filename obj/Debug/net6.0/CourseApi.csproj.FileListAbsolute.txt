@@ -66,3 +66,5 @@ C:\Users\User\OneDrive\Desktop\CourseApi\obj\Debug\net6.0\refint\CourseApi.dll
 C:\Users\User\OneDrive\Desktop\CourseApi\obj\Debug\net6.0\CourseApi.pdb
 C:\Users\User\OneDrive\Desktop\CourseApi\obj\Debug\net6.0\CourseApi.genruntimeconfig.cache
 C:\Users\User\OneDrive\Desktop\CourseApi\obj\Debug\net6.0\ref\CourseApi.dll
+C:\Users\User\OneDrive\Desktop\CourseApi\bin\Debug\net6.0\CourseApi.xml
+C:\Users\User\OneDrive\Desktop\CourseApi\obj\Debug\net6.0\CourseApi.xml

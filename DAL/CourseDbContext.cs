@@ -1,4 +1,5 @@
-﻿using CourseApi.Models;
+﻿using CourseApi.Configuration;
+using CourseApi.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CourseApi.DAL
@@ -9,5 +10,14 @@ namespace CourseApi.DAL
 
         public DbSet<Group> Groups { get; set; }
         public DbSet<Student> Students { get; set; }
+        public DbSet<Teacher> Teachers { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(StudentConfiguration).Assembly);
+            base.OnModelCreating(modelBuilder);
+        }
     }
+
 }
